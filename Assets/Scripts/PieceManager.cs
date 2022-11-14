@@ -33,22 +33,22 @@ public class PieceManager : MonoBehaviour
         GetComponent<Renderer>().material.SetTexture("_SubTex", pieceData.letter);
         transform.localScale = Vector3.one * pieceData.size;
         transform.rotation = rotation[isBlack ? promoted ? 1 : 0 : promoted ? 3 : 2];
-        transform.position = board.GetVector(board.GetCoord(board.ConvertPos(pos, isBlack)));
+        transform.position = board.GetVector(board.GetCoord(pos));
     }
 
     public void MoveTo(Vector2Int target, bool flip)
     {
-        originPosition = board.GetVector(board.GetCoord(board.ConvertPos(pos, isBlack)));
+        originPosition = board.GetVector(board.GetCoord(pos));
         originRotation = rotation[isBlack ? pieceData.code.Length > 1 && promoted ? 1 : 0 : pieceData.code.Length > 1 && promoted ? 3 : 2];
         if(flip)
         {
             promoted = !promoted;
         }
-        if (target.y == 10)
+        if (target.y == (isBlack ? 0 : 10))
         {
             isBlack = !isBlack;
         }
-        destPosition = board.GetVector(board.GetCoord(board.ConvertPos(target, isBlack)));
+        destPosition = board.GetVector(board.GetCoord(target));
         destRotation = rotation[isBlack ? pieceData.code.Length > 1 && promoted ? 1 : 0 : pieceData.code.Length > 1 && promoted ? 3 : 2];
         pos = target;
         timer = 1;
