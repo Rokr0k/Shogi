@@ -8,6 +8,7 @@ public class BoardInterface : MonoBehaviour
     public BoardManager board;
     public TMP_InputField input;
     public GameObject indicator;
+    public CameraController cameraController;
     private bool isBlack;
 
     private bool willPromote;
@@ -16,7 +17,7 @@ public class BoardInterface : MonoBehaviour
 
     void Awake()
     {
-        isBlack = true;
+        cameraController.isBlack = isBlack = true;
         if (input.placeholder is TMP_Text)
         {
             ((TMP_Text)input.placeholder).text = isBlack ? "Black" : "White";
@@ -25,7 +26,7 @@ public class BoardInterface : MonoBehaviour
         {
             if (board.Move((isBlack ? "B" : "W") + input.text))
             {
-                isBlack = !isBlack;
+                cameraController.isBlack = isBlack = !isBlack;
                 if (input.placeholder is TMP_Text)
                 {
                     ((TMP_Text)input.placeholder).text = isBlack ? "Black" : "White";
@@ -48,25 +49,10 @@ public class BoardInterface : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if(Input.touchSupported && Input.touchCount>0)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                Vector2Int pos = new Vector2Int(Mathf.RoundToInt(hit.point.x / board.blockSize.x), Mathf.RoundToInt(hit.point.z / board.blockSize.y)) + new Vector2Int(5, 5);
-                HitScreen(pos);
-            }
-            else
-            {
-                selected = new Vector2Int(-1, -1);
-                Unselect();
-            }
-        }
-
-        if (Input.touchSupported && Input.touchCount > 0)
-        {
-            Touch touch = Input.touches[0];
-            if (touch.phase == TouchPhase.Began)
+            Touch touch = Input.GetTouch(0);
+            if(touch.phase == TouchPhase.Began)
             {
                 Ray ray = Camera.main.ScreenPointToRay(touch.position);
                 if (Physics.Raycast(ray, out RaycastHit hit))
@@ -79,6 +65,20 @@ public class BoardInterface : MonoBehaviour
                     selected = new Vector2Int(-1, -1);
                     Unselect();
                 }
+            }
+        }
+        else if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                Vector2Int pos = new Vector2Int(Mathf.RoundToInt(hit.point.x / board.blockSize.x), Mathf.RoundToInt(hit.point.z / board.blockSize.y)) + new Vector2Int(5, 5);
+                HitScreen(pos);
+            }
+            else
+            {
+                selected = new Vector2Int(-1, -1);
+                Unselect();
             }
         }
     }
@@ -222,7 +222,7 @@ public class BoardInterface : MonoBehaviour
 
             if (board.Move(team + type + from + move + to + promote))
             {
-                isBlack = !isBlack;
+                cameraController.isBlack = isBlack = !isBlack;
                 if (input.placeholder is TMP_Text)
                 {
                     ((TMP_Text)input.placeholder).text = isBlack ? "Black" : "White";
